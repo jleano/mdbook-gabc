@@ -1,11 +1,11 @@
 [package]
-name = "mdbook-gregorio"
+name = "mdbook-gabc"
 version = "0.0.1"
 authors = ["Joseph Leano <joseph.leano@gmail.com>"]
-description = "mdbook preprocessor to add gregorio support"
+description = "mdbook preprocessor to add gabc support"
 license = "MPL-2.0"
-homepage = "https://github.com/jleano/mdbook-gregorio"
-repository = "https://github.com/jleano/mdbook-gregorio"
+homepage = "https://github.com/jleano/mdbook-gabc"
+repository = "https://github.com/jleano/mdbook-gabc"
 edition = "2018"
 
 [dependencies]

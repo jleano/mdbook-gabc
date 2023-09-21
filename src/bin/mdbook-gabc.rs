@@ -1,7 +1,7 @@
 use clap::{crate_version, Arg, ArgMatches, Command};
 use mdbook::errors::Error;
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
-use mdbook_gregorio::Gregorio;
+use mdbook_gabc::Gabc;
 use toml_edit::{value, Array, Document, Item, Table, Value};
 
 use std::{
@@ -19,9 +19,9 @@ const EXSURGE_FILES: &[(&str, &[u8])] = &[
 ];
 
 pub fn make_app() -> Command {
-    Command::new("mdbook-gregorio")
+    Command::new("mdbook-gabc")
         .version(crate_version!())
-        .about("mdbook preprocessor to add gregorio support")
+        .about("mdbook preprocessor to add gabc support")
         .subcommand(
             Command::new("supports")
                 .arg(Arg::new("renderer").required(true))
@@ -58,14 +58,14 @@ fn handle_preprocessing() -> Result<(), Error> {
 
     if ctx.mdbook_version != mdbook::MDBOOK_VERSION {
         eprintln!(
-            "Warning: The mdbook-gregorio preprocessor was built against version \
+            "Warning: The mdbook-gabc preprocessor was built against version \
              {} of mdbook, but we're being called from version {}",
             mdbook::MDBOOK_VERSION,
             ctx.mdbook_version
         );
     }
 
-    let processed_book = Gregorio.run(&ctx, book)?;
+    let processed_book = Gabc.run(&ctx, book)?;
     serde_json::to_writer(io::stdout(), &processed_book)?;
 
     Ok(())
@@ -75,7 +75,7 @@ fn handle_supports(sub_args: &ArgMatches) -> ! {
     let renderer = sub_args
         .get_one::<String>("renderer")
         .expect("Required argument");
-    let supported = Gregorio.supports_renderer(renderer);
+    let supported = Gabc.supports_renderer(renderer);
 
     // Signal whether the renderer is supported by exiting with 1 or 0.
     if supported {
@@ -143,8 +143,10 @@ fn handle_install(sub_args: &ArgMatches) -> ! {
         }
     }
 
-    log::info!("Files & configuration for mdbook-gregorio are installed. You can start using it in your book.");
-    let codeblock = r#"```gregorio
+    log::info!(
+        "Files & configuration for mdbook-gabc are installed. You can start using it in your book."
+    );
+    let codeblock = r#"```gabc
 (f3) EC(ce!fg)CE(f) *(,) ad(fe~)vé(f!gwhf)nit(f) (,)
 ```"#;
     log::info!("Add a code block like:\n{}", codeblock);
@@ -197,7 +199,7 @@ fn additional<'a>(doc: &'a mut Document, additional_type: &str) -> Option<&'a mu
 
 fn has_preprocessor(doc: &mut Document) -> bool {
     doc.get("preprocessor")
-        .and_then(|p| p.get("gregorio"))
+        .and_then(|p| p.get("gabc"))
         .map(|m| matches!(m, Item::Table(_)))
         .unwrap_or(false)
 }
@@ -211,9 +213,9 @@ fn add_preprocessor(doc: &mut Document) {
     let item = item
         .as_table_mut()
         .unwrap()
-        .entry("gregorio")
+        .entry("gabc")
         .or_insert(empty_table);
-    item["command"] = value("mdbook-gregorio");
+    item["command"] = value("mdbook-gabc");
 }
 
 fn has_file(elem: &Option<&mut Array>, file: &str) -> bool {

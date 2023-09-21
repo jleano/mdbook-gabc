@@ -3,11 +3,11 @@ use mdbook::errors::Result;
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
 use pulldown_cmark::{CodeBlockKind::*, Event, Options, Parser, Tag};
 
-pub struct Gregorio;
+pub struct Gabc;
 
-impl Preprocessor for Gregorio {
+impl Preprocessor for Gabc {
     fn name(&self) -> &str {
-        "gregorio"
+        "gabc"
     }
 
     fn run(&self, _ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
@@ -18,7 +18,7 @@ impl Preprocessor for Gregorio {
             }
 
             if let BookItem::Chapter(ref mut chapter) = *item {
-                res = Some(Gregorio::add_gregorio(chapter).map(|md| {
+                res = Some(Gabc::add_gabc(chapter).map(|md| {
                     chapter.content = md;
                 }));
             }
@@ -46,8 +46,8 @@ fn escape_html(s: &str) -> String {
     output
 }
 
-fn add_gregorio(content: &str) -> Result<String> {
-    let mut in_gregorio_block = false;
+fn add_gabc(content: &str) -> Result<String> {
+    let mut in_gabc_block = false;
 
     let mut opts = Options::empty();
     opts.insert(Options::ENABLE_TABLES);
@@ -58,18 +58,18 @@ fn add_gregorio(content: &str) -> Result<String> {
     let mut code_span = 0..0;
     let mut start_new_code_span = true;
 
-    let mut gregorio_blocks = vec![];
+    let mut gabc_blocks = vec![];
 
     let events = Parser::new_ext(content, opts);
 
     for (e, span) in events.into_offset_iter() {
         log::debug!("e={:?}, span={:?}", e, span);
         if let Event::Start(Tag::CodeBlock(Fenced(code))) = e.clone() {
-            in_gregorio_block = !code.is_empty();
+            in_gabc_block = !code.is_empty();
             continue;
         }
 
-        if !in_gregorio_block {
+        if !in_gabc_block {
             continue;
         }
 
@@ -86,28 +86,25 @@ fn add_gregorio(content: &str) -> Result<String> {
         }
 
         if let Event::End(Tag::CodeBlock(Fenced(code))) = e {
-            if in_gregorio_block {
+            if in_gabc_block {
                 assert_eq!(
-                    "gregorio", &*code,
-                    "After an opening gregorio code block we expect it to close again"
+                    "gabc", &*code,
+                    "After an opening gabc code block we expect it to close again"
                 );
             }
-            in_gregorio_block = false;
+            in_gabc_block = false;
 
-            let gregorio_content = &content[code_span.clone()];
-            let gregorio_content = escape_html(gregorio_content);
-            let gregorio_content = gregorio_content.replace("\r\n", "\n");
-            let gregorio_code = format!(
-                "<pre class=\"chant-container\">{}</pre>\n\n",
-                gregorio_content
-            );
-            gregorio_blocks.push((span, gregorio_code));
+            let gabc_content = &content[code_span.clone()];
+            let gabc_content = escape_html(gabc_content);
+            let gabc_content = gabc_content.replace("\r\n", "\n");
+            let gabc_content = format!("<pre class=\"chant-container\">{}</pre>\n\n", gabc_content);
+            gabc_blocks.push((span, gabc_content));
             start_new_code_span = true;
         }
     }
 
     let mut content = content.to_string();
-    for (span, block) in gregorio_blocks.iter().rev() {
+    for (span, block) in gabc_blocks.iter().rev() {
         let pre_content = &content[0..span.start];
         let post_content = &content[span.end..];
         content = format!("{}\n{}{}", pre_content, block, post_content);
@@ -115,9 +112,9 @@ fn add_gregorio(content: &str) -> Result<String> {
     Ok(content)
 }
 
-impl Gregorio {
-    fn add_gregorio(chapter: &mut Chapter) -> Result<String> {
-        add_gregorio(&chapter.content)
+impl Gabc {
+    fn add_gabc(chapter: &mut Chapter) -> Result<String> {
+        add_gabc(&chapter.content)
     }
 }
 
@@ -125,13 +122,13 @@ impl Gregorio {
 mod test {
     use pretty_assertions::assert_eq;
 
-    use super::add_gregorio;
+    use super::add_gabc;
 
     #[test]
-    fn adds_gregorio() {
+    fn adds_gabc() {
         let content = r#"# Chapter
 
-```gregorio
+```gabc
 (f3) EC(ce!fg)CE(f) *(,) ad(fe~)vé(f!gwhf)nit(f) (,)
 ```
 
@@ -149,7 +146,7 @@ Text
 Text
 "#;
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
@@ -171,7 +168,7 @@ Text
 | Row 1  | Row 2  |
 "#;
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
@@ -197,7 +194,7 @@ Text
 </del>
 "#;
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
@@ -223,16 +220,16 @@ Text
 2. paragraph 2
 "#;
 
-        let ret = add_gregorio(content).unwrap();
+        let ret = add_gabc(content).unwrap();
         assert_eq!(expected, ret);
     }
 
     #[test]
-    fn escape_in_gregorio_block() {
+    fn escape_in_gabc_block() {
         //TODO may be able to delete this method.
         let _ = env_logger::try_init();
         let content = r#"
-```gregorio
+```gabc
 (f3) EC(ce!fg)CE(f) *(,) ad(fe~)vé(f!gwhf)nit(f) (,)
 ```
 
@@ -249,7 +246,7 @@ hello
 hello
 "#;
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
@@ -257,7 +254,7 @@ hello
         let _ = env_logger::try_init();
         let content = r#"# Chapter
 
-````gregorio
+````gabc
 (f3) EC(ce!fg)CE(f) *(,) ad(fe~)vé(f!gwhf)nit(f) (,)
 ````
 
@@ -275,22 +272,22 @@ Text
 Text
 "#;
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
     fn crlf_line_endings() {
         let _ = env_logger::try_init();
-        let content = "# Chapter\r\n\r\n````gregorio\r\n\r\n(f3) EC(ce!fg)CE(f) *(,)\r\nad(fe~)vé(f!gwhf)nit(f) (,)\r\n````";
+        let content = "# Chapter\r\n\r\n````gabc\r\n\r\n(f3) EC(ce!fg)CE(f) *(,)\r\nad(fe~)vé(f!gwhf)nit(f) (,)\r\n````";
         let expected =
             "# Chapter\r\n\r\n\n<pre class=\"chant-container\">\n(f3) EC(ce!fg)CE(f) *(,)\nad(fe~)vé(f!gwhf)nit(f) (,)\n</pre>\n\n";
 
-        assert_eq!(expected, add_gregorio(content).unwrap());
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 
     #[test]
-    fn test_leaves_nongregorio_untouched() {
+    fn test_leaves_nongabc_untouched() {
         let content = r#"Chapter\nsample program```python\nprint('output')```\nfinished"#;
-        assert_eq!(content, add_gregorio(content).unwrap());
+        assert_eq!(content, add_gabc(content).unwrap());
     }
 }
