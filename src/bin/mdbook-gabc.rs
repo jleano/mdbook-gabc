@@ -11,10 +11,10 @@ use std::{
     process,
 };
 
-const EXSURGE_JS: &[u8] = include_bytes!("assets/exsurge.js");
+const EXSURGE_JS: &[u8] = include_bytes!("assets/exsurge.min.js");
 const EXSURGE_INIT_JS: &[u8] = include_bytes!("assets/exsurge-init.js");
 const EXSURGE_FILES: &[(&str, &[u8])] = &[
-    ("exsurge.js", EXSURGE_JS),
+    ("exsurge.min.js", EXSURGE_JS),
     ("exsurge-init.js", EXSURGE_INIT_JS),
 ];
 

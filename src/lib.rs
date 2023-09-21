@@ -65,7 +65,7 @@ fn add_gabc(content: &str) -> Result<String> {
     for (e, span) in events.into_offset_iter() {
         log::debug!("e={:?}, span={:?}", e, span);
         if let Event::Start(Tag::CodeBlock(Fenced(code))) = e.clone() {
-            in_gabc_block = !code.is_empty();
+            in_gabc_block = &*code == "gabc";
             continue;
         }
 
@@ -289,5 +289,13 @@ Text
     fn test_leaves_nongabc_untouched() {
         let content = r#"Chapter\nsample program```python\nprint('output')```\nfinished"#;
         assert_eq!(content, add_gabc(content).unwrap());
+    }
+
+    #[test]
+    fn test_multiple_blocks() {
+        let content = "```\nsample code\n```\n```gabc\n(f3) ec(f)ce(g)\n```\n";
+        let expected =
+            "```\nsample code\n```\n\n<pre class=\"chant-container\">(f3) ec(f)ce(g)\n</pre>\n\n\n";
+        assert_eq!(expected, add_gabc(content).unwrap());
     }
 }

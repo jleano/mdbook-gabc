@@ -13,7 +13,6 @@ for (let i=0; i< chantContainers.length; i++) {
 
     score.performLayoutAsync(ctxt, function() {
         score.layoutChantLines(ctxt, chantContainers[i].clientWidth, function() {
-            // render the score to svg code
             chantContainers[i].innerHTML = score.createSvg(ctxt);
         });
     });
