@@ -47,7 +47,6 @@ fn escape_html(s: &str) -> String {
 }
 
 fn add_gregorio(content: &str) -> Result<String> {
-    //let mut gregorio_content = String::new();
     let mut in_gregorio_block = false;
 
     let mut opts = Options::empty();
@@ -63,25 +62,14 @@ fn add_gregorio(content: &str) -> Result<String> {
 
     let events = Parser::new_ext(content, opts);
 
-    println!("before loop");
     for (e, span) in events.into_offset_iter() {
-        println!("in loop, e={:?}, span={:?}", e, span);
         log::debug!("e={:?}, span={:?}", e, span);
         if let Event::Start(Tag::CodeBlock(Fenced(code))) = e.clone() {
-            println!("in fenced1. code={:?}", code);
-            //if &*code == "" {
-            if code.is_empty() {
-                println!("in fenced2");
-                in_gregorio_block = false;
-                //gregorio_content.clear();
-            } else {
-                in_gregorio_block = true;
-            }
+            in_gregorio_block = !code.is_empty();
             continue;
         }
 
         if !in_gregorio_block {
-            println!("not in block");
             continue;
         }
 
@@ -94,11 +82,9 @@ fn add_gregorio(content: &str) -> Result<String> {
             } else {
                 code_span = code_span.start..span.end;
             }
-
             continue;
         }
 
-        println!("code_span = {:?}", code_span);
         if let Event::End(Tag::CodeBlock(Fenced(code))) = e {
             if in_gregorio_block {
                 assert_eq!(
@@ -115,26 +101,17 @@ fn add_gregorio(content: &str) -> Result<String> {
                 "<pre class=\"chant-container\">{}</pre>\n\n",
                 gregorio_content
             );
-            println!("code={:?}", gregorio_code);
             gregorio_blocks.push((span, gregorio_code));
             start_new_code_span = true;
         }
     }
 
     let mut content = content.to_string();
-    println!("after loop. content={:?}", content);
     for (span, block) in gregorio_blocks.iter().rev() {
         let pre_content = &content[0..span.start];
         let post_content = &content[span.end..];
-        println!(
-            "block={:?}, pre_content={:?}, post_content={:?}",
-            block,
-            pre_content.clone(),
-            post_content
-        );
         content = format!("{}\n{}{}", pre_content, block, post_content);
     }
-    println!("after loop1. content={:?}", content);
     Ok(content)
 }
 
@@ -247,9 +224,7 @@ Text
 "#;
 
         let ret = add_gregorio(content).unwrap();
-        println!("bfore assert. ret={:?}", ret);
         assert_eq!(expected, ret);
-        //assert_eq!(expected, add_gregorio(content).unwrap());
     }
 
     #[test]
