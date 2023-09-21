@@ -1,12 +1,12 @@
 [book]
-title = "All mermaid config options missing"
+title = "All gabc config options missing"
 
 [preprocessor]
 
-[preprocessor.mermaid]
-command = "mdbook-mermaid"
+[preprocessor.gabc]
+command = "mdbook-gabc"
 
 [output]
 
 [output.html]
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = ["exsurge.min.js", "exsurge-init.js"]

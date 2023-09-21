@@ -158,7 +158,7 @@ fn add_additional_files(doc: &mut Document) -> bool {
     let mut changed = false;
     let mut printed = false;
 
-    let file = "exsurge.js";
+    let file = "exsurge.min.js";
     let additional_js = additional(doc, "js");
     if has_file(&additional_js, file) {
         log::debug!("'{}' already in 'additional-js'. Skipping", file)

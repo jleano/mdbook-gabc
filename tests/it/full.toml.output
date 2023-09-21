@@ -1,9 +1,9 @@
 [book]
-title = "mdbook-mermaid fully configured"
+title = "mdbook-gabc fully configured"
 
-[preprocessor.mermaid]
-command = "mdbook-mermaid"
+[preprocessor.gabc]
+command = "mdbook-gabc"
 renderer = ["html"]
 
 [output.html]
-additional-js =["mermaid.min.js", "mermaid-init.js"]
+additional-js =["exsurge.min.js", "exsurge-init.js"]
